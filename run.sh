@@ -9,7 +9,7 @@ fi
 CPUFREQ_DIR=/sys/devices/system/cpu/cpufreq
 if ! [[ -d $CPUFREQ_DIR ]]; then
     echo "$0: CPUFREQ_DIR is not found, your system might not support intel_pstate scaling."
-    exit 0
+    exit 1
 fi
 
 # Set shell option: nullglob
