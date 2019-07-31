@@ -55,5 +55,6 @@ case "$1" in
         echo " -i|--idle            Idle mode, set the lowest frequency as possible"
         echo " -p|--performance     Performance mode, for developing and specific purpose"
         echo " -s|--save            Save mode, good for browsing and do some tasks"
+        exit 1
     ;;
 esac
