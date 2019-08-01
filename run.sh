@@ -8,7 +8,7 @@ fi
 # `cpufreq` directory.
 CPUFREQ_DIR=/sys/devices/system/cpu/cpufreq
 if ! [[ -d $CPUFREQ_DIR ]]; then
-    echo "$0: CPUFREQ_DIR is not found, your system might not support intel_pstate scaling."
+    echo "$0: $CPUFREQ_DIR is not found, your system might not support CPU scaling."
     exit 1
 fi
 
@@ -20,6 +20,21 @@ CPUS=($CPUFREQ_DIR/*)
 # Counting all the available cpu(s).
 T_CPU=${#CPUS[@]}
 
+# Saved data.
+FILE_DAT=./.saved
+
+if ! [[ -f $FILE_DAT ]]; then
+    touch $FILE_DAT
+fi
+
+function fread() {
+    echo $(cat $FILE_DAT)
+}
+
+function fwrite() {
+    echo $1 > $FILE_DAT
+}
+
 function apply_changes() {
     local mode=$1
 
@@ -30,6 +45,7 @@ function apply_changes() {
         done
     done
 
+    fwrite $mode
     echo "Applying success! Current mode: $mode"
     exit 0
 }
@@ -47,6 +63,10 @@ case "$1" in
     -s|--save)
         apply_changes "save"
     ;;
+    -c|--current)
+        echo "Current mode: $(fread)"
+        exit 0
+    ;;
     *)
         echo "$0: no mode given"
         echo "Usage: $0 [mode]"
@@ -55,6 +75,7 @@ case "$1" in
         echo " -i|--idle            Idle mode, set the lowest frequency as possible"
         echo " -p|--performance     Performance mode, for developing and specific purpose"
         echo " -s|--save            Save mode, good for browsing and do some tasks"
+        echo " -c|--current         Show current mode"
         exit 1
     ;;
 esac
