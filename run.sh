@@ -19,9 +19,11 @@ shopt -s nullglob
 CPUS=($CPUFREQ_DIR/*)
 # Counting all the available cpu(s).
 T_CPU=${#CPUS[@]}
+# Define script's directory.
+SCRIPT_DIR="${0%/*}"
 
 # Saved data.
-FILE_DAT=./.saved
+FILE_DAT=$SCRIPT_DIR/.saved
 
 if ! [[ -f $FILE_DAT ]]; then
     touch $FILE_DAT
@@ -36,17 +38,17 @@ function fwrite() {
 }
 
 function apply_changes() {
-    local mode=$1
+    local mode_dir=$SCRIPT_DIR/$1
 
     # Start copying.
     for ((i = 0; i < $T_CPU; ++i)); do
-        for j in $mode/*; do
+        for j in $mode_dir/*; do
             cp $j $CPUFREQ_DIR/policy$i
         done
     done
 
-    fwrite $mode
-    echo "Applying success! Current mode: $mode"
+    fwrite $1
+    echo "Applying success! Current mode: $1"
     exit 0
 }
 
@@ -67,6 +69,9 @@ case "$1" in
         echo "Current mode: $(fread)"
         exit 0
     ;;
+    -l|--last)
+        apply_changes "$(fread)"
+    ;;
     *)
         echo "$0: no mode given"
         echo "Usage: $0 [mode]"
@@ -76,6 +81,7 @@ case "$1" in
         echo " -p|--performance     Performance mode, for developing and specific purpose"
         echo " -s|--save            Save mode, good for browsing and do some tasks"
         echo " -c|--current         Show current mode"
+        echo " -l|--last            Apply last used mode"
         exit 1
     ;;
 esac
